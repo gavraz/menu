@@ -5,6 +5,7 @@ type Builder struct {
 	handler *Handler
 }
 
+// NewBuilder instantiates a menu builder that expects the menu to be controlled by the menu handler h
 func NewBuilder(h *Handler) *Builder {
 	return &Builder{
 		menu:    &Menu{},
@@ -12,15 +13,7 @@ func NewBuilder(h *Handler) *Builder {
 	}
 }
 
-func (mb *Builder) init() {
-	if mb.menu == nil {
-		mb.menu = &Menu{}
-	}
-}
-
 func (mb *Builder) add(label string, action action) {
-	mb.init()
-
 	mb.menu.actions = append(mb.menu.actions, action)
 	mb.menu.labels = append(mb.menu.labels, label)
 }

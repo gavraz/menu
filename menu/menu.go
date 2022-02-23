@@ -2,11 +2,13 @@ package menu
 
 type action func() *Menu
 
+// Menu represents a menu/submenu
 type Menu struct {
 	actions []action
 	labels  []string
 }
 
+// Handler controls and manipulates the state of the menu
 type Handler struct {
 	prev          []*Menu
 	current       *Menu
