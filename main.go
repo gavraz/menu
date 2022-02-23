@@ -8,19 +8,21 @@ import (
 
 func buildMenuHandler() *menu.Handler {
 	h := menu.NewHandler()
-	settings := menu.NewBuilder(h).
-		WithOption("Name", func() {
+	subMenu := menu.NewBuilder(h).
+		WithOption("Inner Option 1", func() {
+			fmt.Println("Inner 1")
 		}).
-		WithOption("Character", func() {
+		WithOption("Inner Option 2", func() {
+			fmt.Println("Inner 2")
 		}).
 		WithGoBack("Go Back").
 		Build()
 
 	mainMenu := menu.NewBuilder(h).
 		WithOption("Start", func() {
-			fmt.Println("Starting game...")
+			fmt.Println("Starting...")
 		}).
-		WithSubMenu("Settings", settings).
+		WithSubMenu("Settings", subMenu).
 		WithOption("Quit", func() {
 			fmt.Println("quitting")
 			os.Exit(0)
@@ -34,5 +36,17 @@ func buildMenuHandler() *menu.Handler {
 
 func main() {
 	h := buildMenuHandler()
+	h.Choose()
+
+	// choose submenu
+	h.NextChoice()
+	h.Choose()
+	// choose inner 1
+	h.Choose()
+	h.GoBack()
+
+	// choose to quit
+	h.NextChoice()
+	h.NextChoice()
 	h.Choose()
 }

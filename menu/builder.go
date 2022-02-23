@@ -1,24 +1,24 @@
-package main
+package menu
 
 type Builder struct {
-	menu    *main.Menu
-	handler *main.Handler
+	menu    *Menu
+	handler *Handler
 }
 
-func NewBuilder(h *main.Handler) *Builder {
+func NewBuilder(h *Handler) *Builder {
 	return &Builder{
-		menu:    &main.Menu{},
+		menu:    &Menu{},
 		handler: h,
 	}
 }
 
 func (mb *Builder) init() {
 	if mb.menu == nil {
-		mb.menu = &main.Menu{}
+		mb.menu = &Menu{}
 	}
 }
 
-func (mb *Builder) add(label string, action main.action) {
+func (mb *Builder) add(label string, action action) {
 	mb.init()
 
 	mb.menu.actions = append(mb.menu.actions, action)
@@ -26,7 +26,7 @@ func (mb *Builder) add(label string, action main.action) {
 }
 
 func (mb *Builder) WithOption(label string, action func()) *Builder {
-	mb.add(label, func() *main.Menu {
+	mb.add(label, func() *Menu {
 		action()
 		return mb.menu
 	})
@@ -35,7 +35,7 @@ func (mb *Builder) WithOption(label string, action func()) *Builder {
 }
 
 func (mb *Builder) WithGoBack(label string) *Builder {
-	mb.add(label, func() *main.Menu {
+	mb.add(label, func() *Menu {
 		mb.handler.GoBack()
 		return mb.menu
 	})
@@ -43,14 +43,14 @@ func (mb *Builder) WithGoBack(label string) *Builder {
 	return mb
 }
 
-func (mb *Builder) WithSubMenu(label string, submenu *main.Menu) *Builder {
-	mb.add(label, func() *main.Menu {
+func (mb *Builder) WithSubMenu(label string, submenu *Menu) *Builder {
+	mb.add(label, func() *Menu {
 		return submenu
 	})
 
 	return mb
 }
 
-func (mb *Builder) Build() *main.Menu {
+func (mb *Builder) Build() *Menu {
 	return mb.menu
 }
