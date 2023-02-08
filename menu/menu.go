@@ -13,12 +13,11 @@ type Handler struct {
 	prev          []*Menu
 	current       *Menu
 	currentChoice int
-	state         bool
 }
 
 // NewHandler returns a menu handler with no menu attached
 //
-// A menu handler should be used only after setting the menu using Handler.SetMenu
+// A menu handler should be used to manipulate a menu only after setting the menu using Handler.SetMenu
 func NewHandler() *Handler {
 	return &Handler{}
 }
@@ -30,7 +29,7 @@ func (h *Handler) SetMenu(menu *Menu) {
 
 // PrevChoice moves to the previous choice if applicable
 func (h *Handler) PrevChoice() {
-	if h.currentChoice == 0 {
+	if h.currentChoice <= 0 {
 		return
 	}
 
@@ -39,35 +38,39 @@ func (h *Handler) PrevChoice() {
 
 // NextChoice moves to the next choice if applicable
 func (h *Handler) NextChoice() {
-	if h.currentChoice == len(h.current.actions)-1 {
+	if h.currentChoice >= len(h.current.actions)-1 {
 		return
 	}
 
 	h.currentChoice++
 }
 
-func (h *Handler) nextMenu(next *Menu) {
+func (h *Handler) push(next *Menu) {
 	h.prev = append(h.prev, h.current)
 	h.current = next
-	h.currentChoice = 0
-}
 
-func (h *Handler) stateChanged(prev bool) bool {
-	return prev != h.state
+	h.currentChoice = 0
 }
 
 // Choose invokes the action attached to the current choice
 func (h *Handler) Choose() {
-	stateStamp := h.state
 	act := h.current.actions[h.currentChoice]
-	next := act()
-	if h.current != next && !h.stateChanged(stateStamp) {
-		h.nextMenu(next)
+
+	nextMenu := act()
+	if nextMenu == nil {
+		return
 	}
+
+	h.push(nextMenu)
 }
 
-func (h *Handler) changeState() {
-	h.state = !h.state
+func (h *Handler) pop() {
+	last := len(h.prev) - 1
+	h.current = h.prev[last]
+	h.prev[last] = nil
+	h.prev = h.prev[:last]
+
+	h.currentChoice = 0
 }
 
 // GoBack goes to the previous menu if applicable
@@ -76,15 +79,10 @@ func (h *Handler) GoBack() {
 		return
 	}
 
-	h.changeState()
-	last := len(h.prev) - 1
-	h.current = h.prev[last]
-	h.prev[last] = nil
-	h.prev = h.prev[:last]
-	h.currentChoice = 0
+	h.pop()
 }
 
-// Choices returns a copy of the labels of the current menu
+// Choices returns the labels of the current menu
 func (h *Handler) Choices() []string {
 	c := make([]string, len(h.current.labels))
 	copy(c, h.current.labels[:])

@@ -26,7 +26,7 @@ func (mb *Builder) add(label string, action action) {
 func (mb *Builder) WithOption(label string, action func()) *Builder {
 	mb.add(label, func() *Menu {
 		action()
-		return mb.menu
+		return nil
 	})
 
 	return mb
@@ -36,7 +36,7 @@ func (mb *Builder) WithOption(label string, action func()) *Builder {
 func (mb *Builder) WithGoBack(label string) *Builder {
 	mb.add(label, func() *Menu {
 		mb.handler.GoBack()
-		return mb.menu
+		return nil
 	})
 
 	return mb
