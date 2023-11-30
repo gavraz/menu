@@ -1,26 +1,58 @@
 # Menu
 A simple, yet flexible, menu with submenu.
 
-## Example
-
-### Import
-
+### Example
 ```go
-import "github.com/gavraz/menu/menu"
+package main
 
+import (
+	"fmt"
+	"github.com/gavraz/menu"
+	"os"
+)
+
+func buildMenuHandler() *menu.Handler {
+	h := menu.NewHandler()
+	subMenu := menu.NewBuilder(h).
+		WithOption("Inner Option 1", func() {
+			fmt.Println("Inner 1")
+		}).
+		WithOption("Inner Option 2", func() {
+			fmt.Println("Inner 2")
+		}).
+		WithGoBack("Go Back").
+		Build()
+
+	mainMenu := menu.NewBuilder(h).
+		WithOption("Start", func() {
+			fmt.Println("Starting...")
+		}).
+		WithSubMenu("Settings", subMenu).
+		WithOption("Quit", func() {
+			fmt.Println("quitting")
+			os.Exit(0)
+		}).
+		Build()
+
+	h.SetMenu(mainMenu)
+
+	return h
+}
+
+func main() {
+	h := buildMenuHandler()
+	h.Choose()
+
+	// choose submenu
+	h.NextChoice()
+	h.Choose()
+	// choose inner 1
+	h.Choose()
+	h.GoBack()
+
+	// choose to quit
+	h.NextChoice()
+	h.NextChoice()
+	h.Choose()
+}
 ```
-
-### Usage
-```go
-h := menu.NewHandler()
-
-mainMenu := menu.NewBuilder(h).
-  WithOption("Option A", func() {
-  fmt.Println("You chose: Option A")
-}).Build()
-
-h.SetMenu(mainMenu)
-```
-
-To build a menu with submenu and a go-back option see main.go.
-

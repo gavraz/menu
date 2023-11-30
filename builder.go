@@ -1,4 +1,4 @@
-package menu
+package main
 
 // Builder builds a menu and submenu hierarchies.
 //
